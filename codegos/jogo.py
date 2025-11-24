@@ -1,69 +1,165 @@
 import random
+import os
 
+# VARIAVEIS:
+limite_chances = 3      ## chances por rodada
+limite_rodadas = 5      ## número maximo de rodadas
 
+tabela_pontos = {'chaces_restantes': limite_chances, 'rodada_atual': 1, 'pontuação': 0, 'nivel': 1}
 
-def gerarNumero():
-    return random.randint(0, 20)
+# HISTÓRICO:
+historico = []  # registra vitorias e derrotas
 
-def pedirEntrada():
+# DIFICULDADE:
+dificuldade_bonus = 0  # aumenta +5 a cada 2 rodadas
+
+# FUNCOES:
+def gerarNumero(): # Sorteia um numero
+    return random.randint(0, 10 + dificuldade_bonus)
+
+numero = gerarNumero() # Recolhe o numero sorteado 
+
+def pedirEntrada(): # Recolhendo entrada do player
     entrada = input('Chute um número (ou digite "pare" para encerrar): ').strip()
     return entrada
 
+def dica(nivel, estado, entrada): # verifica o nivel e da uma dica de acordo com o nivel
+    if estado == 'maior':
+        if nivel == 1:
+            print(f"É menor que {entrada}")
+    elif estado == 'menor':
+        if nivel == 1:
+            print(f"É maior que {entrada}")
+        # if nivel == 2:
+        #     n1 = random.randint(entrada - (entrada-1),(entrada -1))
+        #     n1 = numero - n1
+        #     print(f'É maior que a soma entre {n1} + {n2} {entrada}')
 
 
-limite_chances = 3      ## chances por rodada
-limite_rodadas = 5      ## número maximo de rodadas
-rodada_atual = 1        ## começa na rodada 1
 
-numero = gerarNumero()
-chances_restantes = limite_chances
+def atualizar_tabela(NumeroUsuario, N): # Atualiza dados da tabela
+    os.system('cls')
+    if NumeroUsuario > N: # Checagem de acertos
+        dica(tabela_pontos["nivel"], 'maior', NumeroUsuario)
+        tabela_pontos["chaces_restantes"] -= 1
 
-while rodada_atual <= limite_rodadas:
+    elif NumeroUsuario < N:
+        dica(tabela_pontos["nivel"], 'menor', NumeroUsuario)
+        tabela_pontos["chaces_restantes"] -= 1
+        
 
-    print(f"Rodada {rodada_atual} de {limite_rodadas}")
-    print(f"Chances restantes: {chances_restantes}")
+    else:
+        print("Acertou seu cabeçudo")
+
+        # -registrar vitória -
+        pontos_ganhos = 3 if tabela_pontos["chaces_restantes"] == 3 else \
+                        2 if tabela_pontos["chaces_restantes"] == 2 else \
+                        1
+        historico.append({
+            "rodada": tabela_pontos["rodada_atual"] + 1,
+            "resultado": "VITÓRIA",
+            "numero_sorteado": N,
+            "chute": NumeroUsuario,
+            "pontos_ganhos": pontos_ganhos
+        })
+      
+
+        if tabela_pontos["chaces_restantes"] == 3:
+            tabela_pontos["pontuação"] += 3
+
+        if tabela_pontos["chaces_restantes"] == 2:
+            tabela_pontos["pontuação"] += 2
+
+        if tabela_pontos["chaces_restantes"] == 1:
+            tabela_pontos["pontuação"] += 1
+
+        tabela_pontos["chaces_restantes"] = limite_chances
+       
+        tabela_pontos["rodada_atual"] += 1
+        return True
+
+
+
+
+
+
+
+
+
+
+# GAME:
+
+
+
+while tabela_pontos["rodada_atual"] <= limite_rodadas:
+
+    print(tabela_pontos)
 
     entrada = pedirEntrada()
 
  
-    if entrada.lower() == "pare":
+    if entrada.lower() == "pare": # Encerra o jogo
+        os.system('cls')
         print("Jogo encerrado pelo usuário.")
         break
 
    
-    if entrada == "":
+    if entrada == "": # Checa se digiotou algo
+        os.system('cls')
         print("Você não digitou nada.")
         continue
 
-    if not entrada.isdigit():
+    if not entrada.isdigit(): # Checa se digitou um número
+        os.system('cls')
         print("Digite apenas números!")
         continue
 
-    NumeroUsuario = int(entrada)
+    if entrada == 0:
+        print('Não pode ser zero!')
+        continue
 
-    if NumeroUsuario > numero:
-        print(f"É menor que {NumeroUsuario}")
-        chances_restantes -= 1
+    if(atualizar_tabela(int(entrada), numero)): # Atualizar tabela
 
-    elif NumeroUsuario < numero:
-        print(f"É maior que {NumeroUsuario}")
-        chances_restantes -= 1
-
-    else:
-        print("Acertou seu cabeçudo")
+        #  aumenta a difilcuade a cada 2 rodadas
+        if tabela_pontos["rodada_atual"] % 2 == 0:
+            dificuldade_bonus += 5
+            print(f"\n ih boyzin... agora a chapa esquentou: agora o intervalo é de 0 até {10 + dificuldade_bonus} ")
        
         numero = gerarNumero()
-        chances_restantes = limite_chances
-       
-        rodada_atual += 1
         continue
 
     
-    if chances_restantes == 0:
+    if tabela_pontos["chaces_restantes"] == 0:
+        os.system('cls')
         print(f"\n cabosse! O número era {numero}.")
     
-        chances_restantes = limite_chances
+        # -registrar derrota-
+        historico.append({
+            "rodada": tabela_pontos["rodada_atual"] + 1,
+            "resultado": "DERROTA",
+            "numero_sorteado": numero,
+            "chute": int(entrada),
+            "pontos_ganhos": 0
+        })
+        
+
+        tabela_pontos["chaces_restantes"] = limite_chances
+
+        # ---- AUMENTO DE DIFICULDADE A CADA 2 RODADAS ----
+        if tabela_pontos["rodada_atual"] % 2 == 0:
+            dificuldade_bonus += 5
+            print(f"\n ih boyzin... agora a chapa esquentou: intervalo é de 0 até  {10 + dificuldade_bonus} ")
+        # --------------------------------------------------
+
         numero = gerarNumero()
-        rodada_atual += 1
+        tabela_pontos["rodada_atual"] += 1
 
 print("\nGAME OVER!")
+
+#  HISTÓRICO 
+print("\n= HISTÓRICO DE RODADAS =")
+for i, h in enumerate(historico, start=1):
+    print(
+        f"{i:02d} | Rodada {h['rodada']} | {h['resultado']} | "
+        f"Sorteado: {h['numero_sorteado']} | Chute: {h['chute']} | Pontos: {h['pontos_ganhos']}"
+    )
