@@ -1,9 +1,9 @@
 import random
 import os
 
-# VARIAVEIS:
-limite_chances = 3      ## chances por rodada
-limite_rodadas = 5      ## número maximo de rodadas
+# VARIAVEIS
+limite_chances = 3      ## chances por rodada 
+limite_rodadas = 999     ## número maximo aumentei para 999 para assim o jogo rodar por mais tempo
 
 tabela_pontos = {'chaces_restantes': limite_chances, 'rodada_atual': 1, 'pontuação': 0, 'nivel': 1}
 
@@ -12,6 +12,28 @@ historico = []  # registra vitorias e derrotas
 
 # DIFICULDADE:
 dificuldade_bonus = 0  # aumenta +5 a cada 2 rodadas
+
+#CARREGAR_SAVE
+def carregar_save():
+    escolha = input("Deseja carregar o save anterior? (s/n): ").strip().lower()
+    if escolha == 'n':
+        return None
+    if os.path.exists("salvamento.txt"): #o carregamento só ocorre se o arquivo existir e se confirmado
+        with open("salvamento.txt", "r") as save:
+            linhas = save.readlines()
+        dados = {}
+        for linha in linhas:
+            linha = linha.strip()
+            if "=" in linha:
+                chave, valor = linha.split("=")
+                dados[chave] = int(valor)
+            print("Save carregado")
+        return dados
+    else:
+        print("Nenhum save encontrado")
+        return None
+
+    
 
 # FUNCOES:
 def gerarNumero(): # Sorteia um numero
@@ -89,11 +111,29 @@ def atualizar_tabela(NumeroUsuario, N): # Atualiza dados da tabela
 
 # GAME:
 
+dados = carregar_save()
+if dados is not None:
+    tabela_pontos.update(dados)
+    tabela_pontos.update({k: v for k, v in dados.items() if k in tabela_pontos})
+    print("Save aplicado com sucesso!")
+else:
+    print("Iniciando novo jogo...")
+
+
+if dados is not None and "dificuldade_bonus" in dados:
+    dificuldade_bonus = dados["dificuldade_bonus"]
+
+
 
 
 while tabela_pontos["rodada_atual"] <= limite_rodadas:
 
-    print(tabela_pontos)
+    print(
+        f"Rodada: {tabela_pontos['rodada_atual']} | "
+        f"Chances: {tabela_pontos['chaces_restantes']} | "        #mudei para que  a tabela de pontos fique mais bonita
+        f"Pontos: {tabela_pontos['pontuação']} | "
+        f"Nível: {tabela_pontos['nivel']}"
+    ) 
 
     entrada = pedirEntrada()
 
@@ -163,3 +203,12 @@ for i, h in enumerate(historico, start=1):
         f"{i:02d} | Rodada {h['rodada']} | {h['resultado']} | "
         f"Sorteado: {h['numero_sorteado']} | Chute: {h['chute']} | Pontos: {h['pontos_ganhos']}"
     )
+
+# SALVAMENTO DO HISTÓRICO EM ARQUIVO
+with open("salvamento.txt", "w") as save:
+    for chave, valor in tabela_pontos.items():
+        save.write(f"{chave}={valor}\n")
+    save.write(f"dificuldade_bonus={dificuldade_bonus}\n")
+    
+    print("\nProgresso salvo em 'salvamento.txt'.")
+   
