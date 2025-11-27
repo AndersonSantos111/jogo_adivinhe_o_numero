@@ -5,7 +5,7 @@ import os
 limite_chances = 3      ## chances por rodada 
 limite_rodadas = 999     ## número maximo aumentei para 999 para assim o jogo rodar por mais tempo
 
-tabela_pontos = {'chaces_restantes': limite_chances, 'rodada_atual': 1, 'pontuação': 0, 'nivel': 1}
+tabela_pontos = {'chaces_restantes': limite_chances, 'rodada_atual': 1, 'pontuação': 0, 'nivel': 2}
 
 # HISTÓRICO:
 historico = []  # registra vitorias e derrotas
@@ -49,14 +49,21 @@ def dica(nivel, estado, entrada): # verifica o nivel e da uma dica de acordo com
     if estado == 'maior':
         if nivel == 1:
             print(f"É menor que {entrada}")
+        if nivel == 2:
+            total = random.randint(numero + 1, numero * 2)
+            n1 = random.randint(1, total - 1)
+            n2 = total - n1
+            print(f"O número secreto é menor que a soma entre {n1} + {n2}")
+        if nivel == 3:
+            {}
     elif estado == 'menor':
         if nivel == 1:
             print(f"É maior que {entrada}")
-        # if nivel == 2:
-        #     n1 = random.randint(entrada - (entrada-1),(entrada -1))
-        #     n1 = numero - n1
-        #     print(f'É maior que a soma entre {n1} + {n2} {entrada}')
-
+        if nivel == 2:
+            n = random.randint(1, numero - entrada - 1)
+            print(f"É maior que {entrada} + {n}")
+        if nivel == 3:
+            {}
 
 
 def atualizar_tabela(NumeroUsuario, N): # Atualiza dados da tabela
@@ -127,13 +134,14 @@ if dados is not None and "dificuldade_bonus" in dados:
 
 
 while tabela_pontos["rodada_atual"] <= limite_rodadas:
-
+    print('-------------------------------------------------')
     print(
-        f"Rodada: {tabela_pontos['rodada_atual']} | "
+        f"| Rodada: {tabela_pontos['rodada_atual']} | "
         f"Chances: {tabela_pontos['chaces_restantes']} | "        #mudei para que  a tabela de pontos fique mais bonita
         f"Pontos: {tabela_pontos['pontuação']} | "
-        f"Nível: {tabela_pontos['nivel']}"
-    ) 
+        f"Nível: {tabela_pontos['nivel']} |"
+    )
+    print('-------------------------------------------------')
 
     entrada = pedirEntrada()
 
