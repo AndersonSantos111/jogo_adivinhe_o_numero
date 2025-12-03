@@ -3,7 +3,7 @@ import os
 
 # VARIAVEIS
 limite_chances = 3      ## chances por rodada 
-limite_rodadas = 10     ## número maximo aumentei para 999 para assim o jogo rodar por mais tempo
+limite_rodadas = 10     ## o número maximo de rodadas que o jogo pode alcançar
 
 tabela_pontos = {'chaces_restantes': limite_chances, 'rodada_atual': 1, 'pontuação': 0, 'nivel': 2}
 
