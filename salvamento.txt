@@ -1,7 +1,7 @@
 chaces_restantes=3
 rodada_atual=3
 pontua��o=0
-nivel=2
+nivel=1
 pontua��o=0
-dificuldade_bonus=10
-dificuldade_bonus=15
+dificuldade_bonus=0
+dificuldade_bonus=0

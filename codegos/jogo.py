@@ -3,7 +3,7 @@ import os
 
 # VARIAVEIS
 limite_chances = 3      ## chances por rodada 
-limite_rodadas = 999     ## número maximo aumentei para 999 para assim o jogo rodar por mais tempo
+limite_rodadas = 10     ## número maximo aumentei para 999 para assim o jogo rodar por mais tempo
 
 tabela_pontos = {'chaces_restantes': limite_chances, 'rodada_atual': 1, 'pontuação': 0, 'nivel': 2}
 
@@ -54,16 +54,17 @@ def dica(nivel, estado, entrada): # verifica o nivel e da uma dica de acordo com
             n1 = random.randint(1, total - 1)
             n2 = total - n1
             print(f"O número secreto é menor que a soma entre {n1} + {n2}")
-        if nivel == 3:
-            {}
+            
     elif estado == 'menor':
         if nivel == 1:
             print(f"É maior que {entrada}")
         if nivel == 2:
-            n = random.randint(1, numero - entrada - 1)
+            n = 0
+            if entrada <= 1:
+                n = random.randint(1, numero - entrada - 1)
+            else:
+                n = random.randint(1, numero - entrada)
             print(f"É maior que {entrada} + {n}")
-        if nivel == 3:
-            {}
 
 
 def atualizar_tabela(NumeroUsuario, N): # Atualiza dados da tabela
@@ -199,6 +200,8 @@ while tabela_pontos["rodada_atual"] <= limite_rodadas:
             print(f"\n ih boyzin... agora a chapa esquentou: intervalo é de 0 até  {10 + dificuldade_bonus} ")
         # --------------------------------------------------
 
+        if tabela_pontos["rodada_atual"] == 5:
+            tabela_pontos["nivel"] += 1
         numero = gerarNumero()
         tabela_pontos["rodada_atual"] += 1
 
